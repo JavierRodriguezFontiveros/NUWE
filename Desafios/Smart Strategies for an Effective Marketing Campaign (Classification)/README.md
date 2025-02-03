@@ -1,3 +1,7 @@
+
+![certificado](predictions/certificado.png)
+
+
 # 📈 Smart Strategies for an Effective Marketing Campaign 🚀
 
 Category   ➡️   Data Science
