@@ -1,0 +1,25 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "sqs:SendMessage",
+          "sns:Publish",
+          "kinesis:PutRecord",
+          "kinesis:PutRecords",
+          "s3:PutObject",
+          "s3:GetObject",
+          "logs:*"
+        ],
+        "Resource": [
+          "arn:aws:sqs:REGION:ACCOUNT_ID:QUEUE_NAME",
+          "arn:aws:sns:REGION:ACCOUNT_ID:TOPIC_NAME",
+          "arn:aws:kinesis:REGION:ACCOUNT_ID:STREAM_NAME",
+          "arn:aws:s3:::YOUR_BUCKET_NAME/*",
+          "arn:aws:logs:REGION:ACCOUNT_ID:log-group:/aws/lambda/LAMBDA_FUNCTION_NAME:*"
+        ]
+      }
+    ]
+  }
+  
