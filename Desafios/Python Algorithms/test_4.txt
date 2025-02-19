@@ -1,0 +1,83 @@
+import pytest
+import json
+import random as rand
+
+from project.objectives.priorityqueue import PriorityQueue 
+from project.objectives.huffmantree import HuffmanTree
+from project.objectives.huffmancoding import HuffmanCoding
+
+objectives = {
+    "1": False,
+    "2": False,
+    "3": False,
+    "4": False,
+}
+
+MIN_INT = - 500
+MAX_INT =   500
+
+def set_objective(id, value):
+    global objectives
+    if id in objectives.keys():
+        objectives[id] = value
+
+@pytest.fixture(scope="module")
+def generate_report():
+    global objectives
+    json_object = json.dumps(objectives, indent=4)
+    with open("results.json", "w") as outfile:
+        outfile.write(json_object)
+
+class Test_Objective_4:
+
+    obj = {
+        'total': 0,
+        'passed': 0,
+        }
+
+    def test_encode(self):
+        self.obj["total"] += 1
+
+        text1 = "Hello"
+        text2 = "Hello this is another test text"
+        text3 = "A text is a passage of words that conveys a set of meanings to the person who is reading it. It’s a body of written work, in various forms and structures, that can be words, phrases and sentences that piece together a passage of written work."
+        text4 = "Type parameters declared through a type parameter list are visible within the scope of the declaration and any nested scopes, but not in the outer scope. For example, they can be used in the type annotations for the methods of a generic class or in the class body. However, they cannot be used in the module scope after the class is defined. See Type parameter lists for a detailed description of the runtime semantics of type parameters."
+
+        bint1, hufft1 = HuffmanCoding.encode(text1)
+        assert len(bint1) < (len(text1) * 8) * 0.60
+        assert len(bint1) > 0
+
+        bint2, hufft2 = HuffmanCoding.encode(text2)
+        assert len(bint2) < (len(text2) * 8) * 0.60
+        assert len(bint2) > 0
+
+        bint3, hufft3 = HuffmanCoding.encode(text3)
+        assert len(bint3) < (len(text3) * 8) * 0.60
+        assert len(bint3) > 0
+
+        bint4, hufft4 = HuffmanCoding.encode(text4)
+        assert len(bint4) < (len(text4) * 8) * 0.60
+        assert len(bint4) > 0
+
+        self.obj["passed"] += 1
+
+    def test_decode(self):
+        self.obj["total"] += 1
+        text = "Type parameters declared through a type parameter list are visible within the scope of the declaration and any nested scopes, but not in the outer scope. For example, they can be used in the type annotations for the methods of a generic class or in the class body. However, they cannot be used in the module scope after the class is defined. See Type parameter lists for a detailed description of the runtime semantics of type parameters."
+
+        bint, hufft = HuffmanCoding.encode(text)
+        assert len(bint) < (len(text) * 8)
+        assert len(bint) > 0 
+
+        decodedText = HuffmanCoding.decode(bint, hufft)
+        assert decodedText == text 
+
+        self.obj["passed"] += 1
+
+    def test_set_objectives(self):
+        value = self.obj['total'] == self.obj['passed']
+        set_objective( "4", value)
+
+
+def test_generate_report(generate_report):
+    assert 1 == 1

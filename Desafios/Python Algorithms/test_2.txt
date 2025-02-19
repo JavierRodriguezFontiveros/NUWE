@@ -1,0 +1,159 @@
+import pytest
+import json
+import random as rand
+
+from project.objectives.priorityqueue import PriorityQueue 
+from project.objectives.huffmantree import HuffmanTree
+from project.objectives.huffmancoding import HuffmanCoding
+
+objectives = {
+    "1": False,
+    "2": False,
+    "3": False,
+    "4": False,
+}
+
+MIN_INT = - 500
+MAX_INT =   500
+
+def set_objective(id, value):
+    global objectives
+    if id in objectives.keys():
+        objectives[id] = value
+
+@pytest.fixture(scope="module")
+def generate_report():
+    global objectives
+    json_object = json.dumps(objectives, indent=4)
+    with open("results.json", "w") as outfile:
+        outfile.write(json_object)
+
+class Test_Objective_2:
+    obj = {
+        'total': 0,
+        'passed': 0,
+        }
+
+    huffman = HuffmanTree()
+
+    def test_create_node(self):
+        self.obj["total"] += 1
+
+        try:
+            _ = self.huffman.createNode(freq=20, left=None, right=None)
+            assert 1 == 0 # Should never reached
+        except Exception as e:
+            assert True
+
+        try:
+            _ = self.huffman.createNode(char='A', left=None, right=None)
+            assert 1 == 0 # Should never reached
+        except Exception as e:
+            assert True
+
+        try:
+            _ = self.huffman.createNode(left=None, right=None)
+            assert 1 == 0 # Should never be reached.
+        except Exception as e:
+            assert True
+
+        node = self.huffman.createNode(char='A', freq=20, left=None, right=None)
+        assert node.char == 'A'
+        assert node.freq == 20
+        assert node.left == None
+        assert node.right == None
+
+        nodeB = self.huffman.createNode(char='B', freq=50, left=None, right=node)
+        assert nodeB.char == 'B'
+        assert nodeB.freq == 50
+        assert nodeB.left == None
+        assert nodeB.right == node
+
+        nodeC = self.huffman.createNode(char='C', freq=0, left=node, right=nodeB)
+        assert nodeC.char == 'C'
+        assert nodeC.freq == 0
+        assert nodeC.left == node
+        assert nodeC.right == nodeB
+
+        self.obj["passed"] += 1
+
+    def test_compose_node(self):
+        self.obj["total"] += 1
+        a = self.huffman.createNode(char='C', freq=10, left=None, right=None)
+        b = self.huffman.createNode(char='B', freq=25, left=None, right=None)
+        
+        try:
+            ab = self.huffman.composeNode(None,None)
+            assert 1 == 0  # Should never be reached
+        except:
+            assert True
+
+        try:
+            ab = self.huffman.composeNode(a,None)
+            assert 1 == 0  # Should never be reached
+        except:
+            assert True
+
+        try:
+            ab = self.huffman.composeNode(None,b)
+            assert 1 == 0  # Should never be reached
+        except:
+            assert True
+        
+        ab = self.huffman.composeNode(a,b)
+        assert ab.char == None
+        assert ab.freq == a.freq + b.freq
+        assert ab.left == a
+        assert ab.right == b
+
+        self.obj["passed"] += 1
+
+    def test_frequencies(self):
+        self.obj["total"] += 1
+        text1 = ""
+        text2 = "THIS IS A TEST" # 4 + 1 + 2 + 1 + 1 + 1 + 4 = 14
+        text3 = "THIS IS AN INCREDIBLY LONG TEXT THAT YOU SHOULD NOT BE READING BECAUSE IT DOES NOT GIVE ANYTHING BUT A LONG TEXT. I RECOMMEND READING ABOUT HUFFMAN CODING. THERE ARE SOME REALLY GREAT VIDEOS ABOUT IT. CHECK THEM OUT!" # 216
+
+        # The sum of all characters should be the sum of all frequencies.  
+        freq_text1 = self.huffman.frequencies(text1) 
+        freq_text2 = self.huffman.frequencies(text2) 
+        freq_text3 = self.huffman.frequencies(text3) 
+
+        assert freq_text1== {}
+        assert sum(freq_text2.values()) == 14
+        assert sum(freq_text3.values()) == 216
+
+        # Check all keys(chars) are in the text.
+        for k in freq_text2.keys():
+            assert k in text2
+
+        for k in freq_text3.keys():
+            assert k in text3
+
+        self.obj["passed"] += 1
+
+    def test_huffmantree(self):
+        self.obj["total"] += 1
+
+        text2 = "This is a test" # 4 + 1 + 2 + 1 + 1 + 1 + 4 = 14
+        text3 = "THIS IS AN INCREDIBLY LONG TEXT THAT YOU SHOULD NOT BE READING BECAUSE IT DOES NOT GIVE ANYTHING BUT A LONG TEXT. I RECOMMEND READING ABOUT HUFFMAN CODING. THERE ARE SOME REALLY GREAT VIDEOS ABOUT IT. CHECK THEM OUT!" # 216
+
+        try:
+            self.huffman.createHuffmanTree(1)
+            assert 1 == 0  # Should never be reached
+        except Exception as e:
+            assert True
+
+        try:
+            self.huffman.createHuffmanTree("")
+            assert 1 == 0  # Should never be reached
+        except Exception as e:
+            assert True
+
+        self.huffman.createHuffmanTree(text2)
+        
+        self.obj["passed"] += 1
+
+    def test_set_objectives(self):
+        value = self.obj['total'] == self.obj['passed']
+        set_objective( "2", value)

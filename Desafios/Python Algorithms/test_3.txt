@@ -1,0 +1,92 @@
+import pytest
+import json
+import random as rand
+
+from project.objectives.priorityqueue import PriorityQueue 
+from project.objectives.huffmantree import HuffmanTree
+from project.objectives.huffmancoding import HuffmanCoding
+
+objectives = {
+    "1": False,
+    "2": False,
+    "3": False,
+    "4": False,
+}
+
+MIN_INT = - 500
+MAX_INT =   500
+
+def set_objective(id, value):
+    global objectives
+    if id in objectives.keys():
+        objectives[id] = value
+
+@pytest.fixture(scope="module")
+def generate_report():
+    global objectives
+    json_object = json.dumps(objectives, indent=4)
+    with open("results.json", "w") as outfile:
+        outfile.write(json_object)
+
+class Test_Objective_3:
+    obj = {
+        'total': 0,
+        'passed': 0,
+        }
+
+    def test_small_text(self):
+        self.obj["total"] += 1
+        text = "Hello this is a test code"
+
+        huffman = HuffmanTree()
+        huffman.createHuffmanTree(text)
+
+       # The root frequency must be equal to the len of the string passed
+        assert huffman.root.freq == len(text)
+
+        codes = huffman.getCodes()
+        freq = huffman.frequencies(text)
+
+        assert codes.keys() == freq.keys()
+        raw_codes = codes.values()
+
+        assert len(list(raw_codes)) > 0
+
+        # No combination is found. Extremely important if not the compression is wrong
+        for c1 in raw_codes:
+            for c2 in raw_codes:
+                assert c1 + c2 not in raw_codes
+
+        
+        self.obj["passed"] += 1
+
+    def test_long_text(self):
+        self.obj["total"] += 1
+
+        text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac lectus purus. Integer nibh nisl, pretium in nibh ac, mollis interdum dolor. Etiam sit amet fermentum dui, sit amet maximus tellus. Mauris vel commodo nulla. Nulla facilisi. Quisque pulvinar commodo odio et accumsan. Phasellus volutpat luctus quam, fermentum tristique tortor feugiat nec. Morbi non aliquet libero. Nulla sed odio vel erat facilisis congue. Nullam commodo elementum enim, sit amet porta ante pretium at. Quisque sollicitudin lobortis lorem, pulvinar blandit ligula sagittis vitae. Phasellus molestie arcu ipsum, vel dictum felis facilisis eget. Donec convallis varius enim, sed tristique ante rutrum in. Donec porta eros sit amet eros ultrices, a pretium massa rhoncus. Duis a venenatis sapien. Quisque dignissim eu nulla id dapibus. Proin mollis vulputate diam, at dignissim urna facilisis et. Morbi vel egestas metus. Aenean tempus sit amet elit sit amet rhoncus. Vivamus vulputate nisl dignissim augue consequat sollicitudin. Nulla lacus lorem, auctor vel ullamcorper quis, dapibus a tortor. Suspendisse consequat, leo at consectetur accumsan, leo nunc dapibus arcu, at eleifend enim ex eu turpis. Sed condimentum lacus vel dolor accumsan, sed facilisis lorem sollicitudin. Pellentesque vitae aliquam libero, ac imperdiet justo. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Phasellus porta, odio nec gravida dignissim, est purus blandit ex, nec ullamcorper dolor justo ut tellus. Cras vel mollis elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed vel tellus facilisis, suscipit libero sit amet, ornare ligula. Suspendisse placerat maximus facilisis. Quisque tristique tempor rutrum. Nullam laoreet leo sit amet vulputate cursus. Quisque pharetra, sapien vel tincidunt porta, elit magna condimentum velit, sed rutrum enim sapien vel ligula. Proin sollicitudin, nibh hendrerit fermentum dignissim, augue elit viverra nulla, sed semper lectus metus a ligula. Vestibulum consequat, urna ac placerat hendrerit, leo justo aliquam libero, ut feugiat erat mi at nunc. Quisque commodo, elit eget fringilla commodo, lectus arcu consectetur ipsum, id vestibulum justo libero eu nunc. Donec laoreet convallis vulputate. Nunc placerat libero quis venenatis laoreet. Donec at congue magna. Etiam vel nibh vel odio ultrices tincidunt. Vestibulum porttitor tincidunt nisl interdum venenatis. Duis facilisis neque ac placerat pulvinar. Praesent eget quam enim. Proin euismod lorem a fermentum fermentum. Donec arcu lorem, hendrerit vitae luctus quis, feugiat iaculis nisi. Sed id fermentum metus, sit amet tincidunt quam. Donec facilisis, massa quis fermentum ullamcorper, lorem turpis commodo diam, non tempus risus dolor sed eros. Suspendisse eget sollicitudin dui, ac consectetur felis. Sed elit turpis, ornare at cursus in, blandit eget nulla. Nulla facilisi. Ut et lacus nisi. Maecenas ut lectus porttitor, semper massa at, tincidunt urna. Curabitur eleifend dictum nisl, non interdum dolor molestie et. Aenean sed aliquet justo. Duis facilisis interdum lectus eu dapibus. Maecenas at iaculis tortor. Vestibulum venenatis ac quam sed pulvinar. Nunc sagittis mi orci, id tempus elit convallis a. Donec odio est, rutrum vel orci non, consectetur rhoncus sapien. Aenean gravida arcu vitae pharetra aliquet. Duis at euismod tortor, eu rutrum tellus. Sed ut massa sit amet orci lobortis pharetra vel nec nisl. Donec condimentum commodo ligula, a rutrum diam lobortis ut. Maecenas et aliquam tortor, sit amet molestie enim. Quisque et laoreet ligula. Curabitur congue magna vitae risus accumsan porttitor. Duis vitae nisi at ipsum mollis dictum. Phasellus tristique velit sed mauris porta ullamcorper. Nam nec mauris id turpis sodales euismod. Donec magna enim, tristique ut sagittis a, sollicitudin ut sem. Donec posuere, orci quis mattis scelerisque, ligula ligula sollicitudin metus, quis iaculis turpis turpis eu diam. Morbi vitae nulla vel ligula pellentesque molestie sed a lorem. Suspendisse orci dui, rhoncus sed tincidunt vel, facilisis eu urna. Pellentesque semper placerat metus at mattis. Aliquam tempor dui lorem, sit amet molestie diam eleifend quis. Ut libero odio, gravida in feugiat ullamcorper, venenatis non justo. Quisque et nulla mattis, luctus sapien eu, pellentesque nunc. Sed ultrices commodo nibh ut mollis. Nunc non mi lacinia, sodales dolor nec, lacinia velit. Mauris scelerisque varius sagittis. Donec consectetur elit non odio consectetur luctus. Praesent ut condimentum orci, suscipit congue enim. Vestibulum sollicitudin sem nec lectus varius auctor. Pellentesque dapibus vehicula ante eu suscipit. Donec quis convallis sapien. Suspendisse eget tortor bibendum, fermentum ipsum vitae, viverra magna. Donec rhoncus, enim sit amet imperdiet fermentum, urna nunc bibendum turpis, id bibendum est nibh in eros. Pellentesque ac consequat nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; In facilisis lectus sit amet mauris hendrerit, vel vulputate est dictum. Duis a nisi at mi tempus scelerisque. Nullam magna justo, consequat ut efficitur at, ornare in diam. Quisque vehicula orci id arcu laoreet mattis. Suspendisse eget dignissim augue, sed egestas ante. Phasellus consectetur cursus massa. Donec vehicula enim ac ex viverra molestie. Vivamus pulvinar nunc et turpis ultricies, at ornare enim malesuada. Integer ac malesuada felis, id dapibus ex. Proin blandit, justo in efficitur molestie, ipsum velit pharetra nunc, eu ullamcorper dui velit eu nisl. Duis quis venenatis est, euismod fringilla purus. Morbi sed odio ex. Vivamus eu erat risus. Nullam vel elementum orci, sit amet faucibus dui. Pellentesque at vulputate nisi, eu condimentum eros. Proin commodo nulla nec felis auctor, et sodales ipsum consequat. Nulla eget pellentesque quam. Mauris lobortis est vitae nibh malesuada porttitor. Vestibulum malesuada augue eu nulla tempor, et scelerisque lectus blandit. Morbi elementum suscipit semper. Cras mauris magna, venenatis ac ante ac, efficitur ultrices lectus. Nunc placerat odio velit, sit amet accumsan eros molestie a. Nunc efficitur quam ut elementum rhoncus. Praesent commodo dui vel leo rutrum posuere."
+
+        huffman = HuffmanTree()
+        huffman.createHuffmanTree(text)
+
+       # The root frequency must be equal to the len of the string passed
+        assert huffman.root.freq == len(text) 
+
+        codes = huffman.getCodes()
+        freq = huffman.frequencies(text)
+
+        assert codes.keys() == freq.keys()
+        raw_codes = codes.values()
+
+        assert len(list(raw_codes)) > 0
+
+        # No combination is found. Extremely important if not the compression is wrong
+        for c1 in raw_codes:
+            for c2 in raw_codes:
+                assert c1 + c2 not in raw_codes
+
+        
+        self.obj["passed"] += 1
+
+    def test_set_objectives(self):
+        value = self.obj['total'] == self.obj['passed']
+        set_objective( "3", value)
