@@ -1,0 +1,21 @@
+{
+    "target" : {
+        "imagen_1.jpg": 0,
+        "imagen_2.jpg": 0,
+        "imagen_3.jpg": 0,
+        "imagen_4.jpg": 1,
+        "imagen_5.jpg": 1,
+        "imagen_6.jpg": 0,
+        "imagen_7.jpg": 1,
+        "imagen_8.jpeg": 1,
+        "imagen_9.jpeg": 1,
+        "imagen_10.jpg": 0,
+        "imagen_11.jpg": 1,
+        "imagen_12.jpeg": 0,
+        "imagen_13.jpeg": 0,
+        "imagen_14.jpg": 0,
+        "imagen_15.jpeg": 1,
+        "imagen_16.jpg": 1,
+        "imagen_17.jpeg": 1
+    }
+}
