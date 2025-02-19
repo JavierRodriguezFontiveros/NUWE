@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package notification;
+
+service NotificationService {
+  rpc CreateNotification(CreateNotificationRequest) returns (CreateNotificationResponse);
+  rpc CheckUserSubscribed(CheckUserSubscribedRequest) returns (CheckUserSubscribedResponse);
+  rpc SubscribeUser(SubscribeUserRequest) returns (SubscribeUserResponse);
+  rpc UnsubscribeUser(UnsubscribeUserRequest) returns (UnsubscribeUserResponse);
+}
+
+message CreateNotificationRequest {
+  string sender_email = 1;
+  string receiver_email = 2;
+}
+
+message CreateNotificationResponse {
+  bool success = 1;
+}
+
+message CheckUserSubscribedRequest {
+  string email = 1;
+}
+
+message CheckUserSubscribedResponse {
+  bool subscribed = 1;
+}
+
+message SubscribeUserRequest {
+  string email = 1;
+}
+
+message SubscribeUserResponse {
+  bool success = 1;
+}
+
+message UnsubscribeUserRequest {
+  string email = 1;
+}
+
+message UnsubscribeUserResponse {
+  bool success = 1;
+}
+
+message NotificationRequest {
+    string sender_email = 1;
+    string receiver_email = 2;
+    string timestamp = 3;
+    bool read = 4;
+}
