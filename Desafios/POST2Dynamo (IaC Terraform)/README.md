@@ -1,3 +1,49 @@
+🚀 Desafío POST2Dynamo: Infraestructura Serverless con AWS y Terraform 🌍
+Recientemente, participé en un desafío técnico que combinaba AWS, DevOps y Infraestructura como Código (IaC). El reto: automatizar la inserción de datos en DynamoDB mediante una API sin servidor, gestionada con Terraform y desplegada en LocalStack. 💡
+
+🔹 Tecnologías Clave
+🛠 AWS Lambda → Función sin servidor que procesa las solicitudes y las guarda en la base de datos.
+📡 API Gateway → Exposición del endpoint /eventos para interactuar con la Lambda.
+📊 DynamoDB → Base de datos NoSQL para almacenar los eventos.
+📦 Terraform → Herramienta de IaC para definir y desplegar la infraestructura de manera automatizada.
+🛠 LocalStack → Simulación local de AWS para desarrollo y pruebas sin necesidad de una cuenta en la nube.
+
+🏆 El Desafío
+Consistía en construir una infraestructura completamente serverless, donde una solicitud POST a un endpoint creara automáticamente un registro en DynamoDB. Todo esto debía definirse con Terraform y ejecutarse en LocalStack.
+
+📂 Archivos Clave
+📜 main.tf → Define la infraestructura (Lambda, API Gateway y DynamoDB).
+🐍 lambdaname.py → Contiene la lógica de la función Lambda en Python.
+📦 lambdaname.zip → Archivo comprimido con la implementación de la Lambda para su despliegue.
+🔑 policy.json → Configuración de permisos para que los servicios interactúen correctamente.
+
+🚀 Proceso de Solución
+1️⃣ Definir la infraestructura en main.tf con los recursos necesarios.
+2️⃣ Desarrollar la función Lambda para procesar los eventos y almacenarlos en DynamoDB.
+3️⃣ Configurar API Gateway para recibir solicitudes POST.
+4️⃣ Desplegar con Terraform (terraform apply).
+5️⃣ Probar la API enviando solicitudes POST y validando los datos en LocalStack.
+
+🔥 Mi Experiencia Personal
+Cuando leí el enunciado por primera vez, me pareció más complicado de lo que realmente era. Entender la magnitud del problema y cómo conectar cada pieza no fue tarea fácil. Sin embargo, con paciencia y enfoque, poco a poco fui avanzando. 💡
+
+Lo más importante en este tipo de retos es no frustrarse y dividir el problema en partes más pequeñas. Una vez que logré visualizar cada componente (Lambda, API Gateway, DynamoDB y Terraform), todo empezó a encajar.
+
+Para quienes quieran aprender más, dejaré los archivos necesarios para la solución del problema en mi GitHub. 🔗📂
+
+🚀 Escalabilidad y Aplicaciones
+Este tipo de arquitectura serverless permite:
+✅ Reducción de costos (se paga solo por uso).
+✅ Escalabilidad automática sin gestionar servidores.
+✅ Rápido despliegue con Terraform.
+✅ Mayor eficiencia en flujos de trabajo con AWS y DevOps.
+
+Este reto me permitió fortalecer mis habilidades en Cloud Computing, DevOps y Serverless, ¡y ahora voy por más desafíos! 🚀
+
+🔹 ¿Has trabajado con Terraform y AWS Lambda? ¿Cómo ha sido tu experiencia? ¡Déjamelo en los comentarios! 👇🔥
+
+![certificado](certificado.png)
+
 # NUWE Cloud AWS Challenge - ALD
 
 ### Category   ➡️   Cloud AWS
