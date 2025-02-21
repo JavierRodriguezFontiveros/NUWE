@@ -1,0 +1,5 @@
+com\nuwe\app\App.class
+com\nuwe\app\BubbleSort.class
+com\nuwe\app\HeapSort.class
+com\nuwe\app\QuickSort.class
+com\nuwe\app\MergeSort.class
