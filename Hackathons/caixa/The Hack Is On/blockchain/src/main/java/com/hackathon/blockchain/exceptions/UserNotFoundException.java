@@ -1,4 +1,4 @@
-package com.hackathon.blockchain.service;
+package com.hackathon.blockchain.exceptions;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String message) {

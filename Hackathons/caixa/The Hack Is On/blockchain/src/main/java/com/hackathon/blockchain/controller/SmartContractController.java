@@ -5,6 +5,9 @@ import com.hackathon.blockchain.service.SmartContractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.hackathon.blockchain.dto.CreateSmartContractRequest;
+
+
 @RestController
 @RequestMapping("/contracts")
 public class SmartContractController {

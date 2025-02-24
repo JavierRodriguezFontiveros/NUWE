@@ -6,6 +6,12 @@ public class TransactionHistory {
     private List<Transaction> sent;
     private List<Transaction> received;
 
+    // Constructor que acepta las listas de transacciones
+    public TransactionHistory(List<Transaction> sent, List<Transaction> received) {
+        this.sent = sent;
+        this.received = received;
+    }
+
     // Getters y setters
     public List<Transaction> getSent() {
         return sent;

@@ -1,3 +1,5 @@
+package com.hackathon.blockchain.dto;
+
 public class CreateSmartContractRequest {
     private String contractId;
     private String contractName;

@@ -1,4 +1,4 @@
-package com.hackathon.blockchain.exception;
+package com.hackathon.blockchain.exceptions;
 
 import com.hackathon.blockchain.response.ResponseMessage;
 import org.springframework.http.HttpStatus;

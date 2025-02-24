@@ -17,22 +17,22 @@ public class AuthController {
     // Registro de usuario con UserDTO
     @PostMapping("/register")
     public ResponseMessage register(@RequestBody UserDTO userDTO) {
-        // Pasamos los datos del UserDTO a UserService
-        userService.registerUser(userDTO.getUsername(), userDTO.getEmail(), userDTO.getPassword());
+        // Pasamos el UserDTO directamente al servicio
+        userService.registerUser(userDTO);
         return new ResponseMessage("Usuario registrado y logueado exitosamente");
     }
 
     // Login de usuario con LoginDTO
     @PostMapping("/login")
     public ResponseMessage login(@RequestBody LoginDTO loginDTO) {
-        userService.loginUser(loginDTO.getUsername(), loginDTO.getPassword());
+        userService.loginUser(loginDTO);
         return new ResponseMessage("Login exitoso");
     }
 
     // Verificar sesión activa
     @GetMapping("/check-session")
-    public ResponseMessage checkSession(@RequestParam String username) {
-        if (userService.checkSession(username)) {
+    public ResponseMessage checkSession() {
+        if (userService.checkSession()) {
             return new ResponseMessage("Sesión activa");
         }
         return new ResponseMessage("❌ Sesión no activa");
@@ -40,9 +40,8 @@ public class AuthController {
 
     // Logout de usuario
     @PostMapping("/logout")
-    public ResponseMessage logout(@RequestParam String username) {
-        userService.logoutUser(username);
+    public ResponseMessage logout() {
+        userService.logoutUser();
         return new ResponseMessage("Logout exitoso");
     }
 }
-

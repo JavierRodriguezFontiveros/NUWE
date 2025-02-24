@@ -17,12 +17,27 @@ public class WalletService {
     private final TransactionRepository transactionRepository;
     private final MarketDataService marketDataService;
     private final SmartContractService smartContractService;
+    private final UserRepository userRepository;
 
-    public WalletService(WalletRepository walletRepository, TransactionRepository transactionRepository, MarketDataService marketDataService, SmartContractService smartContractService) {
+    public WalletService(WalletRepository walletRepository, TransactionRepository transactionRepository, MarketDataService marketDataService, SmartContractService smartContractService, UserRepository userRepository) {
         this.walletRepository = walletRepository;
         this.transactionRepository = transactionRepository;
         this.marketDataService = marketDataService;
         this.smartContractService = smartContractService;
+        this.userRepository = userRepository;
+    }
+
+    // **Método para crear una billetera**
+    @Transactional
+    public Wallet createWallet(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Crear una nueva billetera con saldo inicial de 100,000$
+        Wallet wallet = new Wallet("address_" + UUID.randomUUID().toString(), 100000.0);
+        wallet.setUser(user);
+        walletRepository.save(wallet);
+
+        return wallet;
     }
 
     // **Método para generar claves RSA para la billetera**
@@ -32,9 +47,9 @@ public class WalletService {
         if (walletOpt.isEmpty()) {
             throw new RuntimeException("Wallet not found for user with ID: " + userId);
         }
-        
+
         Wallet wallet = walletOpt.get();
-        
+
         // Generar claves RSA
         wallet.generateKeys();
 
@@ -44,19 +59,9 @@ public class WalletService {
         return wallet;
     }
 
-    // **Obtener billetera por ID de usuario**
-    public Optional<Wallet> getWalletByUserId(Long userId) {
-        return walletRepository.findByUserId(userId);
-    }
-
-    // **Obtener billetera por dirección**
-    public Optional<Wallet> getWalletByAddress(String address) {
-        return walletRepository.findByAddress(address);
-    }
-
-    // **Compra de activo**
+    // **Método para vender un activo**
     @Transactional
-    public String buyAsset(Long userId, String symbol, double quantity) {
+    public String sellAsset(Long userId, String symbol, double quantity) {
         Optional<Wallet> optionalWallet = walletRepository.findByUserId(userId);
         Optional<Wallet> liquidityWalletOpt = walletRepository.findByAddress("LP-" + symbol);
         Optional<Wallet> usdtLiquidityWalletOpt = walletRepository.findByAddress("LP-USDT");
@@ -70,6 +75,67 @@ public class WalletService {
         Wallet usdtLiquidityWallet = usdtLiquidityWalletOpt.get();
 
         // Verificar si el activo tiene un contrato inteligente y si cumple con las condiciones
+        if (smartContractService.isTransactionBlocked(symbol, "SELL")) {
+            return "❌ Transaction blocked by smart contract conditions for " + symbol;
+        }
+
+        double price = marketDataService.fetchLivePriceForAsset(symbol);
+        double totalCost = quantity * price;
+
+        Optional<Asset> assetOpt = userWallet.getAssets().stream()
+                .filter(a -> a.getSymbol().equals(symbol))
+                .findFirst();
+
+        if (assetOpt.isEmpty() || assetOpt.get().getQuantity() < quantity) {
+            return "❌ Insufficient asset balance!";
+        }
+
+        updateWalletAssets(userWallet, symbol, -quantity);
+        updateWalletAssets(liquidityWallet, symbol, quantity);
+        updateWalletAssets(usdtLiquidityWallet, "USDT", totalCost);
+
+        walletRepository.saveAll(List.of(userWallet, liquidityWallet, usdtLiquidityWallet));
+
+        recordTransaction(userWallet, liquidityWallet, symbol, quantity, price, "SELL");
+        return "✅ Asset sold successfully!";
+    }
+
+    // **Método para obtener la billetera de un usuario**
+    public Wallet getWalletByUserId(Long userId) {
+        return walletRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("Wallet not found for user with ID: " + userId));
+    }
+
+    // **Método para obtener los detalles de la billetera**
+    public WalletDetails getWalletDetails(Long userId) {
+        Wallet wallet = getWalletByUserId(userId);  // Obtener la billetera
+
+        // Calcular el saldo total en efectivo y los detalles de los activos
+        double totalBalance = wallet.getBalance();  // El saldo en efectivo
+        Map<String, Double> assetDetails = new HashMap<>();
+        
+        // Calcular el valor de cada activo y llenar el mapa de activos
+        for (Asset asset : wallet.getAssets()) {
+            double assetValue = asset.getQuantity() * marketDataService.fetchLivePriceForAsset(asset.getSymbol());
+            assetDetails.put(asset.getSymbol(), assetValue);
+            totalBalance += assetValue;  // Sumar al valor neto
+        }
+
+        // Crear y retornar un nuevo objeto WalletDetails
+        WalletDetails walletDetails = new WalletDetails(wallet.getBalance(), totalBalance, assetDetails);
+        walletDetails.setWalletAddress(wallet.getAddress());  // Establecer la dirección de la billetera
+
+        return walletDetails;  // Retornar el objeto con todos los detalles
+    }
+
+    // **Método para comprar un activo**
+    @Transactional
+    public String buyAsset(Long userId, String symbol, double quantity) {
+        Optional<Wallet> walletOpt = walletRepository.findByUserId(userId);
+        if (walletOpt.isEmpty()) return "❌ Wallet not found!";
+
+        Wallet wallet = walletOpt.get();
+
+        // Verificar si el contrato inteligente permite la compra
         if (smartContractService.isTransactionBlocked(symbol, "BUY")) {
             return "❌ Transaction blocked by smart contract conditions for " + symbol;
         }
@@ -77,61 +143,23 @@ public class WalletService {
         double price = marketDataService.fetchLivePriceForAsset(symbol);
         double totalCost = quantity * price;
 
-        if (symbol.equals("USDT")) {
-            if (userWallet.getBalance() < totalCost) return "❌ Insufficient fiat balance to buy USDT!";
-            userWallet.setBalance(userWallet.getBalance() - totalCost);
-            updateWalletAssets(userWallet, "USDT", quantity);
-            updateWalletAssets(usdtLiquidityWallet, "USDT", -quantity);
-        } else {
-            Optional<Asset> usdtAssetOpt = userWallet.getAssets().stream()
-                    .filter(a -> a.getSymbol().equals("USDT"))
-                    .findFirst();
-            if (usdtAssetOpt.isEmpty() || usdtAssetOpt.get().getQuantity() < totalCost) {
-                return "❌ Insufficient USDT balance! You must buy USDT first.";
-            }
-            updateWalletAssets(userWallet, "USDT", -totalCost);
-            updateWalletAssets(usdtLiquidityWallet, "USDT", totalCost);
-            updateWalletAssets(userWallet, symbol, quantity);
-            updateWalletAssets(liquidityWallet, symbol, -quantity);
+        if (wallet.getBalance() < totalCost) {
+            return "❌ Insufficient balance!";
         }
-        walletRepository.saveAll(List.of(userWallet, liquidityWallet, usdtLiquidityWallet));
-        recordTransaction(liquidityWallet, userWallet, symbol, quantity, price, "BUY");
-        return "✅ Asset purchased successfully!";
+
+        // Actualizar el saldo de la billetera
+        updateWalletAssets(wallet, symbol, quantity);
+        wallet.setBalance(wallet.getBalance() - totalCost);
+        walletRepository.save(wallet);
+
+        recordTransaction(wallet, wallet, symbol, quantity, price, "BUY");
+        return "✅ Asset bought successfully!";
     }
 
-    // **Venta de activo**
-    @Transactional
-    public String sellAsset(Long userId, String symbol, double quantity) {
-        Optional<Wallet> optionalWallet = walletRepository.findByUserId(userId);
-        Optional<Wallet> liquidityWalletOpt = walletRepository.findByAddress("LP-" + symbol);
-
-        if (optionalWallet.isEmpty()) return "❌ Wallet not found!";
-        if (liquidityWalletOpt.isEmpty()) return "❌ Liquidity pool for " + symbol + " not found!";
-
-        Wallet userWallet = optionalWallet.get();
-        Wallet liquidityWallet = liquidityWalletOpt.get();
-
-        // Verificar si el activo tiene un contrato inteligente y si cumple con las condiciones
-        if (smartContractService.isTransactionBlocked(symbol, "SELL")) {
-            return "❌ Transaction blocked by smart contract conditions for " + symbol;
-        }
-
-        double price = marketDataService.fetchLivePriceForAsset(symbol);
-        double totalRevenue = quantity * price;
-
-        Optional<Asset> existingAsset = userWallet.getAssets().stream()
-                .filter(a -> a.getSymbol().equals(symbol))
-                .findFirst();
-
-        if (existingAsset.isEmpty() || existingAsset.get().getQuantity() < quantity) {
-            return "❌ Not enough assets to sell!";
-        }
-        updateWalletAssets(userWallet, symbol, -quantity);
-        updateWalletAssets(liquidityWallet, symbol, quantity);
-        updateWalletAssets(userWallet, "USDT", totalRevenue);
-        walletRepository.saveAll(List.of(userWallet, liquidityWallet));
-        recordTransaction(userWallet, liquidityWallet, symbol, quantity, price, "SELL");
-        return "✅ Asset sold successfully!";
+    // **Método para obtener el historial de transacciones**
+    public TransactionHistory getTransactionHistory(Long userId) {
+        List<Transaction> transactions = transactionRepository.findByWallet_UserId(userId);
+        return new TransactionHistory(transactions, transactions); // Ajuste para el constructor
     }
 
     // **Actualizar activos en la billetera**
@@ -154,10 +182,10 @@ public class WalletService {
         }
     }
 
-    // **Grabar transacciones**
+    // **Método para grabar las transacciones**
     private void recordTransaction(Wallet sender, Wallet receiver, String assetSymbol, double quantity, double price, String type) {
         Transaction transaction = new Transaction(
-            UUID.randomUUID().toString(),  // ID generado automáticamente
+            UUID.randomUUID().toString(),
             sender.getAddress(),
             receiver.getAddress(),
             sender,
@@ -169,6 +197,28 @@ public class WalletService {
             new Date()
         );
         transactionRepository.save(transaction);
+    }
+
+    // **Método para calcular y aplicar una comisión a la transacción**
+    @Transactional
+    public Double transferFee(Transaction transaction, Double feePercentage) {
+        // Verificar que el porcentaje sea válido
+        if (feePercentage < 0 || feePercentage > 100) {
+            throw new IllegalArgumentException("Invalid fee percentage");
+        }
+
+        // Calcular la comisión
+        Double fee = transaction.getAmount() * feePercentage / 100;
+
+        // Actualizar el saldo de la billetera (esto puede variar dependiendo de tu lógica de negocio)
+        Wallet sender = transaction.getSender();
+        sender.setBalance(sender.getBalance() - fee);
+
+        // Guardar la billetera después de actualizar el saldo
+        walletRepository.save(sender);
+
+        // Retornar el valor de la comisión calculada
+        return fee;
     }
 
     // **Actualizar balances programados**

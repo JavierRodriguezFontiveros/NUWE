@@ -10,7 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Estrategia para generar el ID automáticamente
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String username;

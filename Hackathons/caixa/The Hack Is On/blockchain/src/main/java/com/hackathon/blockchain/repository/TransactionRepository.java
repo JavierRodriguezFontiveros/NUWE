@@ -15,4 +15,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     // Encuentra transacciones por su estado (ej. "Pending", "Completed")
     List<Transaction> findByStatus(String status);
+
+    // Encuentra transacciones realizadas desde una wallet asociada a un usuario específico
+    List<Transaction> findBySenderWallet_UserId(Long userId);
+
+    // Encuentra transacciones recibidas por una wallet asociada a un usuario específico
+    List<Transaction> findByReceiverWallet_UserId(Long userId);
+
+    // Método para encontrar transacciones por el ID del usuario de la billetera
+    List<Transaction> findByWallet_UserId(Long userId);  // Esto debería solucionar el problema
 }

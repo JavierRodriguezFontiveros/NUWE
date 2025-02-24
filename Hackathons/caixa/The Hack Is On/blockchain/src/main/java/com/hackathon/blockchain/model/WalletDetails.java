@@ -8,6 +8,13 @@ public class WalletDetails {
     private double netWorth;
     private Map<String, Double> assets;
 
+    // Constructor con parámetros
+    public WalletDetails(double cashBalance, double netWorth, Map<String, Double> assets) {
+        this.cashBalance = cashBalance;
+        this.netWorth = netWorth;
+        this.assets = assets;
+    }
+
     // Getters y setters
     public String getWalletAddress() {
         return walletAddress;

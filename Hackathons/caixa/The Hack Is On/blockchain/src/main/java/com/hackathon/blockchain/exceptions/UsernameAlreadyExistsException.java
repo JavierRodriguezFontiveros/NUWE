@@ -1,4 +1,4 @@
-package com.hackathon.blockchain.service;
+package com.hackathon.blockchain.exceptions;
 
 public class UsernameAlreadyExistsException extends RuntimeException {
     public UsernameAlreadyExistsException(String message) {

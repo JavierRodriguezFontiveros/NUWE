@@ -126,4 +126,9 @@ public class Wallet {
     public String getPrivateKey() {
         return privateKey;
     }
+
+    // Nuevo método para obtener el userId desde la Wallet
+    public Long getUserId() {
+        return user != null ? user.getId() : null;
+    }
 }

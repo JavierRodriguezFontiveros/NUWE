@@ -3,6 +3,7 @@ package com.hackathon.blockchain.service;
 import com.hackathon.blockchain.model.Block;
 import com.hackathon.blockchain.model.Transaction;
 import com.hackathon.blockchain.repository.BlockRepository;
+import com.hackathon.blockchain.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +14,15 @@ import java.util.List;
 public class BlockchainService {
 
     private final BlockRepository blockRepository;
+    private final TransactionRepository transactionRepository; // Para manejar las transacciones
 
     // Lista para almacenar transacciones pendientes
     private List<Transaction> pendingTransactions = new ArrayList<>();
 
     @Autowired
-    public BlockchainService(BlockRepository blockRepository) {
+    public BlockchainService(BlockRepository blockRepository, TransactionRepository transactionRepository) {
         this.blockRepository = blockRepository;
+        this.transactionRepository = transactionRepository;
 
         // Verificar si la blockchain ya tiene bloques, si no, crear el bloque génesis
         if (blockRepository.count() == 0) {
@@ -31,6 +34,13 @@ public class BlockchainService {
 
     // Método para agregar transacciones pendientes
     public void addTransaction(Transaction transaction) {
+        // Asignar el estado inicial "PENDING"
+        transaction.setStatus("PENDING");
+        
+        // Guardar la transacción en la base de datos
+        transactionRepository.save(transaction);  // Persistir en DB
+        
+        // Añadir la transacción a la lista de transacciones pendientes
         pendingTransactions.add(transaction);
     }
 
@@ -42,13 +52,20 @@ public class BlockchainService {
         }
 
         // Obtener el último bloque de la cadena
-        Block lastBlock = blockRepository.findTopByOrderByBlockIndexDesc();
+        Block lastBlock = blockRepository.findTopByOrderByBlockIndexDesc()
+                                        .orElseThrow(() -> new RuntimeException("No blocks found in the blockchain"));
 
         // Agrupar las transacciones pendientes en formato String
-        String data = "Transactions: " + pendingTransactions.toString();
+        StringBuilder transactionData = new StringBuilder("Transactions: ");
+        for (Transaction tx : pendingTransactions) {
+            transactionData.append(tx.getTxId()).append(" ");
+            // Actualizar el estado de las transacciones a "COMPLETED"
+            tx.setStatus("COMPLETED");
+            transactionRepository.save(tx);  // Guardar el estado actualizado
+        }
 
-        // Crear el nuevo bloque
-        Block newBlock = new Block(data, lastBlock.getHash(), "", lastBlock.getBlockIndex() + 1);
+        // Crear el nuevo bloque con las transacciones
+        Block newBlock = new Block(transactionData.toString(), lastBlock.getHash(), "", lastBlock.getBlockIndex() + 1);
         newBlock.setHash(newBlock.calculateHash());  // Calcular el hash del nuevo bloque
         
         // Guardar el bloque en la base de datos
@@ -83,5 +100,3 @@ public class BlockchainService {
         return true;
     }
 }
-
-

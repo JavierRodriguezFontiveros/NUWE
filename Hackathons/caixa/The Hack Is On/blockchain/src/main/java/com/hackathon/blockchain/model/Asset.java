@@ -46,4 +46,31 @@ public class Asset {
         // Por ahora, devolvemos solo quantity como valor. Puedes reemplazarlo con la lógica adecuada.
         return quantity; // Aquí deberías reemplazar con la lógica real para calcular el valor
     }
+    
+    // Métodos getter y setter para la propiedad symbol
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    // Métodos getter y setter para la propiedad quantity
+    public double getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
+    }
+    
+    // Método para obtener la wallet asociada
+    public Wallet getWallet() {
+        return wallet;
+    }
+
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
+    }
 }
