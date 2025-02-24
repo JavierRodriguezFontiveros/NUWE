@@ -158,7 +158,7 @@ public class WalletService {
 
     // **Método para obtener el historial de transacciones**
     public TransactionHistory getTransactionHistory(Long userId) {
-        List<Transaction> transactions = transactionRepository.findByWallet_UserId(userId);
+        List<Transaction> transactions = transactionRepository.findBySenderWallet_User_IdOrDestinationWallet_User_Id(userId, userId);
         return new TransactionHistory(transactions, transactions); // Ajuste para el constructor
     }
 

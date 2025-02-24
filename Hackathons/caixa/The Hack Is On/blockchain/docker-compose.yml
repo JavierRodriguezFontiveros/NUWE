@@ -10,24 +10,22 @@ services:
     volumes:
       - ./keys:/app/keys
     depends_on:
-      - mysql  # La app depende de mysql, así que se arranca después de MySQL
+      - mysql
     networks:
-      - blockchain_network  # Utilizamos una red personalizada
-    restart: no  # No reinicia automáticamente si falla
+      - blockchain_network
+    restart: no
 
   mysql:
-    image: mysql:8.0  # Utilizamos la imagen oficial de MySQL
+    image: mysql:8.0
     environment:
-      MYSQL_DATABASE: blockchain          # Nombre de la base de datos
-      MYSQL_USER: root                    # Usuario para la base de datos
-      MYSQL_PASSWORD: root                # Contraseña del usuario
-      MYSQL_ROOT_PASSWORD: root           # Contraseña para el root de MySQL
+      MYSQL_DATABASE: blockchain
+      MYSQL_ROOT_PASSWORD: root
     ports:
-      - "3306:3306"  # Mapeamos el puerto 3306 del contenedor al puerto 3307 del host
+      - "3307:3306"
     networks:
-      - blockchain_network  # La misma red para conectarse con la app
-    restart: no  # No reinicia automáticamente si falla
+      - blockchain_network
+    restart: no
 
 networks:
   blockchain_network:
-    driver: bridge  # Usamos el driver de red puente para la comunicación entre contenedores
+    driver: bridge
