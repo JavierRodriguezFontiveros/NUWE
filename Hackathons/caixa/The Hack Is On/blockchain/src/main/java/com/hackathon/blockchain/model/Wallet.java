@@ -14,7 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Base64;
 
+import lombok.extern.slf4j.Slf4j;  // Agregar esta importación para el logger
+
 @Entity
+@Slf4j  // Asegurarse de agregar esta anotación
 public class Wallet {
 
     @Id
@@ -51,13 +54,20 @@ public class Wallet {
 
     // Método para generar el par de claves RSA
     public void generateKeys() throws Exception {
+        log.info("Iniciando generación de claves RSA...");  // Usar el log creado por la anotación @Slf4j
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);  // Longitud de la clave
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        
+        if (keyPair.getPublic() == null || keyPair.getPrivate() == null) {
+            log.error("Error: Claves RSA generadas son nulas");
+            throw new RuntimeException("Error: Claves RSA generadas son nulas");
+        }
 
-        // Guardamos las claves en formato Base64 para almacenarlas como cadenas de texto
         this.publicKey = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
         this.privateKey = Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded());
+
+        log.info("Claves RSA generadas correctamente.");
     }
 
     // Getters y setters

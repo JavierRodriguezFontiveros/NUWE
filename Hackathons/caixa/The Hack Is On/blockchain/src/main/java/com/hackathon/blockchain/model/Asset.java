@@ -21,32 +21,28 @@ public class Asset {
     @Column(nullable = false)
     private double quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY)  // Evita cargas innecesarias
+    @ManyToOne(fetch = FetchType.LAZY)  // Relación con Wallet
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
 
+    @ManyToOne(fetch = FetchType.LAZY)  // Relación con SmartContract
+    @JoinColumn(name = "contract_id", nullable = false)  // El nombre de la columna en la base de datos
+    private SmartContract smartContract;
+
     // Constructor sin ID porque se genera automáticamente
-    public Asset(String symbol, double quantity, Wallet wallet) {
+    public Asset(String symbol, double quantity, Wallet wallet, SmartContract smartContract) {
         this.symbol = symbol;
         this.quantity = quantity;
         this.wallet = wallet;
+        this.smartContract = smartContract;  // Asociamos el contrato inteligente
     }
 
     // Método getValue() para obtener el valor de la cantidad de activos
     public double getValue() {
         // Aquí puedes definir la lógica para obtener el valor de un activo.
-        // Por ejemplo, si el valor de cada símbolo está en algún servicio de mercado,
-        // puedes calcular el valor total de los activos.
-        // En este caso, se hace un valor ficticio, asumiendo que "quantity" es el valor.
-
-        // Si tienes un servicio de mercado que devuelve el valor del activo por símbolo,
-        // aquí podrías invocar esa lógica, algo como:
-        // double assetValue = marketDataService.getPriceForSymbol(this.symbol);
-
-        // Por ahora, devolvemos solo quantity como valor. Puedes reemplazarlo con la lógica adecuada.
-        return quantity; // Aquí deberías reemplazar con la lógica real para calcular el valor
+        return quantity; // Reemplazar con lógica real si es necesario
     }
-    
+
     // Métodos getter y setter para la propiedad symbol
     public String getSymbol() {
         return symbol;
@@ -72,5 +68,14 @@ public class Asset {
 
     public void setWallet(Wallet wallet) {
         this.wallet = wallet;
+    }
+
+    // Método para obtener el contrato asociado
+    public SmartContract getSmartContract() {
+        return smartContract;
+    }
+
+    public void setSmartContract(SmartContract smartContract) {
+        this.smartContract = smartContract;
     }
 }

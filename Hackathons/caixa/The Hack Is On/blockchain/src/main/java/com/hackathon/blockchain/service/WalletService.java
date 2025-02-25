@@ -33,7 +33,7 @@ public class WalletService {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         // Crear una nueva billetera con saldo inicial de 100,000$
-        Wallet wallet = new Wallet("address_" + UUID.randomUUID().toString(), 100000.0);
+        Wallet wallet = new Wallet("address_" + UUID.randomUUID().toString(), 100000.0, user);
         wallet.setUser(user);
         walletRepository.save(wallet);
 
@@ -42,22 +42,28 @@ public class WalletService {
 
     // **Método para generar claves RSA para la billetera**
     @Transactional
-    public Wallet generateKeysForWallet(Long userId) throws Exception {
+    public Wallet generateKeysForWallet(Long userId) {
         Optional<Wallet> walletOpt = walletRepository.findByUser_Id(userId);
         if (walletOpt.isEmpty()) {
+            log.error("Wallet not found for user with ID: {}", userId);
             throw new RuntimeException("Wallet not found for user with ID: " + userId);
         }
 
         Wallet wallet = walletOpt.get();
 
-        // Generar claves RSA
-        wallet.generateKeys();
-
-        // Guardar billetera con las claves generadas
-        walletRepository.save(wallet);
+        try {
+            log.info("Generando claves RSA para la billetera del usuario: {}", userId);
+            wallet.generateKeys();
+            walletRepository.save(wallet);
+            log.info("Claves RSA generadas y billetera actualizada para el usuario: {}", userId);
+        } catch (Exception e) {
+            log.error("Error generando claves RSA para el usuario {}: {}", userId, e.getMessage(), e);
+            throw new RuntimeException("Error al generar claves RSA para la billetera", e);
+        }
 
         return wallet;
     }
+
 
     // **Método para vender un activo**
     @Transactional

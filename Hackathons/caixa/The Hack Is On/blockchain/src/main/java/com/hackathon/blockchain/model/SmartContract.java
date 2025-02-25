@@ -23,8 +23,7 @@ public class SmartContract {
     @JoinColumn(name = "wallet_id")  // Relación con Wallet (quien ejecuta el contrato)
     private Wallet associatedWallet;
 
-    @OneToMany
-    @JoinColumn(name = "contract_id")  // Relación con la lista de activos involucrados
+    @OneToMany(mappedBy = "smartContract")  // Relación con la lista de activos involucrados
     private List<Asset> assetsInvolved;
 
     private String contractStatus;
@@ -46,21 +45,28 @@ public class SmartContract {
 
     // Métodos para ejecutar las lógicas del contrato
     public boolean executeContract() {
-        // Lógica para ejecutar el contrato. Podría ser la transferencia de activos, verificación de condiciones, etc.
-        if (contractStatus.equals("Active")) {
+        // Verifica si el contrato está activo
+        if ("Active".equals(contractStatus)) {
+            // Verifica si la wallet tiene suficientes fondos
             if (associatedWallet.getBalance() >= calculateRequiredFunds()) {
-                System.out.println("Ejecutando contrato: " + contractName);
+                // Si los fondos son suficientes, ejecuta el contrato
                 contractStatus = "Completed";
+                System.out.println("Ejecutando contrato: " + contractName);
                 return true;
+            } else {
+                System.out.println("Fondos insuficientes para ejecutar el contrato.");
             }
         }
         return false;
     }
 
+    // Método para calcular los fondos necesarios según los activos involucrados en el contrato
     private double calculateRequiredFunds() {
         double requiredAmount = 0.0;
-        for (Asset asset : assetsInvolved) {
-            requiredAmount += asset.getValue() * asset.getQuantity();
+        if (assetsInvolved != null) {
+            for (Asset asset : assetsInvolved) {
+                requiredAmount += asset.getValue() * asset.getQuantity();
+            }
         }
         return requiredAmount;
     }

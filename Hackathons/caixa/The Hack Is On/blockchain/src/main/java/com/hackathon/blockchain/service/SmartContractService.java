@@ -18,9 +18,19 @@ public class SmartContractService {
 
     // Método para crear un contrato inteligente
     public SmartContract createSmartContract(String contractId, String contractName, String conditionExpression, String action, String actionValue, String issuerWalletId) throws Exception {
-        // Aquí asumimos que issuerWalletId es la dirección de la wallet, puedes adaptarlo si es un Long
+        // Verificar que la dirección de la wallet sea válida
         Wallet associatedWallet = walletRepository.findByAddress(issuerWalletId)
                 .orElseThrow(() -> new Exception("Wallet no encontrada"));
+
+        // Verificar que la wallet esté activa
+        if (!associatedWallet.getAccountStatus().equals("Active")) {
+            throw new Exception("La wallet está inactiva y no puede ejecutar el contrato.");
+        }
+
+        // Verificar si la wallet tiene suficiente saldo (suponiendo que la acción requiere fondos)
+        if (associatedWallet.getBalance() < calculateRequiredFunds(actionValue)) {
+            throw new Exception("La wallet no tiene suficientes fondos para ejecutar el contrato.");
+        }
 
         // Crear el contrato inteligente
         SmartContract smartContract = new SmartContract(contractId, contractName, associatedWallet);
@@ -31,6 +41,13 @@ public class SmartContractService {
 
         // Guardar el contrato en la base de datos
         return smartContractRepository.save(smartContract);
+    }
+
+    // Método para calcular los fondos necesarios según la acción
+    private double calculateRequiredFunds(String actionValue) {
+        // Lógica para calcular los fondos necesarios según la acción
+        // Aquí puedes adaptar la lógica dependiendo de cómo se manejan las transacciones y las acciones en tu sistema.
+        return Double.parseDouble(actionValue);  // Ejemplo de cómo se podría calcular
     }
 
     // Método para desplegar un contrato inteligente
