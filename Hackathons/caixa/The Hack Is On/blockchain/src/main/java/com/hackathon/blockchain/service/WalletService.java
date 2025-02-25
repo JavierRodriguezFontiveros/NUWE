@@ -43,7 +43,7 @@ public class WalletService {
     // **Método para generar claves RSA para la billetera**
     @Transactional
     public Wallet generateKeysForWallet(Long userId) throws Exception {
-        Optional<Wallet> walletOpt = walletRepository.findByUserId(userId);
+        Optional<Wallet> walletOpt = walletRepository.findByUser_Id(userId);
         if (walletOpt.isEmpty()) {
             throw new RuntimeException("Wallet not found for user with ID: " + userId);
         }
@@ -62,7 +62,7 @@ public class WalletService {
     // **Método para vender un activo**
     @Transactional
     public String sellAsset(Long userId, String symbol, double quantity) {
-        Optional<Wallet> optionalWallet = walletRepository.findByUserId(userId);
+        Optional<Wallet> optionalWallet = walletRepository.findByUser_Id(userId);
         Optional<Wallet> liquidityWalletOpt = walletRepository.findByAddress("LP-" + symbol);
         Optional<Wallet> usdtLiquidityWalletOpt = walletRepository.findByAddress("LP-USDT");
 
@@ -102,7 +102,19 @@ public class WalletService {
 
     // **Método para obtener la billetera de un usuario**
     public Wallet getWalletByUserId(Long userId) {
-        return walletRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("Wallet not found for user with ID: " + userId));
+        return walletRepository.findByUser_Id(userId).orElseThrow(() -> new RuntimeException("Wallet not found for user with ID: " + userId));
+    }
+
+    // **Método para obtener o crear la billetera**
+    @Transactional
+    public Wallet getOrCreateWalletForUser(Long userId) {
+        Optional<Wallet> walletOptional = walletRepository.findByUser_Id(userId);
+        if (walletOptional.isPresent()) {
+            return walletOptional.get();
+        } else {
+            // Si no existe la billetera, la crea
+            return createWallet(userId);
+        }
     }
 
     // **Método para obtener los detalles de la billetera**
@@ -130,7 +142,7 @@ public class WalletService {
     // **Método para comprar un activo**
     @Transactional
     public String buyAsset(Long userId, String symbol, double quantity) {
-        Optional<Wallet> walletOpt = walletRepository.findByUserId(userId);
+        Optional<Wallet> walletOpt = walletRepository.findByUser_Id(userId);
         if (walletOpt.isEmpty()) return "❌ Wallet not found!";
 
         Wallet wallet = walletOpt.get();

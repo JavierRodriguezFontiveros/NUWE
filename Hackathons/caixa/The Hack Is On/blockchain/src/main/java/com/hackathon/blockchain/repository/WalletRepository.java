@@ -9,5 +9,5 @@ public interface WalletRepository extends JpaRepository<Wallet, Long> {
     Optional<Wallet> findByAddress(String address);
 
     // Método personalizado para buscar una Wallet por el ID del usuario asociado
-    Optional<Wallet> findByUserId(Long userId);
+    Optional<Wallet> findByUser_Id(Long userId);
 }

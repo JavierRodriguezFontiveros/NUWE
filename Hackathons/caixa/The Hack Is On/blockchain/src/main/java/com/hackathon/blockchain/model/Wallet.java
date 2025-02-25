@@ -10,8 +10,6 @@ import jakarta.persistence.OneToMany;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Base64;
@@ -44,10 +42,11 @@ public class Wallet {
     }
 
     // Constructor con parámetros
-    public Wallet(String address, double balance) {
+    public Wallet(String address, double balance, User user) {
         this.address = address;
         this.balance = balance;
         this.netWorth = 0.0;  // Valor predeterminado
+        this.user = user;     // Asociamos el wallet con un user
     }
 
     // Método para generar el par de claves RSA

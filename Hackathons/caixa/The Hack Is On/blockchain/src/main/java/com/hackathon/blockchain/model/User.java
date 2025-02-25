@@ -1,10 +1,8 @@
 package com.hackathon.blockchain.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.util.List;
 
 @Entity
 public class User {
@@ -16,6 +14,9 @@ public class User {
     private String username;
     private String email;
     private String password;
+
+    @OneToMany(mappedBy = "user")  // Relación con Wallet
+    private List<Wallet> wallets;
 
     // Constructor vacío
     public User() {
@@ -68,5 +69,14 @@ public class User {
     public void setPassword(String password) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         this.password = encoder.encode(password);  // Encripta la contraseña antes de almacenarla
+    }
+
+    // Getter y setter para los Wallets asociados a este User
+    public List<Wallet> getWallets() {
+        return wallets;
+    }
+
+    public void setWallets(List<Wallet> wallets) {
+        this.wallets = wallets;
     }
 }
