@@ -14,9 +14,9 @@ public class SmartContract {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id;  // Esta es la clave primaria generada por la base de datos
 
-    private String contractId;
+    private String contractId;  // Se usa String porque en el DTO es String
     private String contractName;
 
     @ManyToOne
@@ -32,15 +32,18 @@ public class SmartContract {
     private String conditionExpression;  // Expresión de la condición del contrato
     private String action;               // Acción que se realiza en el contrato
     private String actionValue;          // Valor de la acción
-    private String issuerWalletId;       // Identificador de la wallet emisora
     private String digitalSignature;     // Firma digital
 
-    // Constructor
-    public SmartContract(String contractId, String contractName, Wallet associatedWallet) {
+    // Constructor actualizado para tomar los parámetros como String y Wallet en lugar de issuerWalletId
+    public SmartContract(String contractId, String contractName, Wallet associatedWallet, 
+                         String conditionExpression, String action, String actionValue) {
         this.contractId = contractId;
         this.contractName = contractName;
         this.associatedWallet = associatedWallet;
         this.contractStatus = "Active";  // Un estado por defecto
+        this.conditionExpression = conditionExpression;
+        this.action = action;
+        this.actionValue = actionValue;
     }
 
     // Métodos para ejecutar las lógicas del contrato
@@ -69,47 +72,6 @@ public class SmartContract {
             }
         }
         return requiredAmount;
-    }
-
-    // Nuevos métodos que faltaban
-    public String getConditionExpression() {
-        return conditionExpression;
-    }
-
-    public void setConditionExpression(String conditionExpression) {
-        this.conditionExpression = conditionExpression;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public String getActionValue() {
-        return actionValue;
-    }
-
-    public void setActionValue(String actionValue) {
-        this.actionValue = actionValue;
-    }
-
-    public String getIssuerWalletId() {
-        return issuerWalletId;
-    }
-
-    public void setIssuerWalletId(String issuerWalletId) {
-        this.issuerWalletId = issuerWalletId;
-    }
-
-    public String getDigitalSignature() {
-        return digitalSignature;
-    }
-
-    public void setDigitalSignature(String digitalSignature) {
-        this.digitalSignature = digitalSignature;
     }
 
     // Getters y Setters tradicionales
@@ -151,6 +113,39 @@ public class SmartContract {
 
     public void setContractStatus(String contractStatus) {
         this.contractStatus = contractStatus;
+    }
+
+    // Nuevas propiedades
+    public String getConditionExpression() {
+        return conditionExpression;
+    }
+
+    public void setConditionExpression(String conditionExpression) {
+        this.conditionExpression = conditionExpression;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public String getActionValue() {
+        return actionValue;
+    }
+
+    public void setActionValue(String actionValue) {
+        this.actionValue = actionValue;
+    }
+
+    public String getDigitalSignature() {
+        return digitalSignature;
+    }
+
+    public void setDigitalSignature(String digitalSignature) {
+        this.digitalSignature = digitalSignature;
     }
 
     // Métodos adicionales para devolver el tipo y el nombre

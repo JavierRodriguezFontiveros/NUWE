@@ -1,19 +1,33 @@
 package com.hackathon.blockchain.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CreateSmartContractRequest {
-    private String contractId;
+
+    @JsonProperty("contractId")
+    private Long contractId;
+
+    @JsonProperty("name")
     private String contractName;
+
+    @JsonProperty("conditionExpression")
     private String conditionExpression;
+
+    @JsonProperty("action")
     private String action;
+
+    @JsonProperty("actionValue")
     private String actionValue;
-    private String issuerWalletId;
+
+    @JsonProperty("issuerWalletId")
+    private String issuerWalletId;  // Cambiado de Long a String
 
     // Getters y setters
-    public String getContractId() {
+    public Long getContractId() {
         return contractId;
     }
 
-    public void setContractId(String contractId) {
+    public void setContractId(Long contractId) {
         this.contractId = contractId;
     }
 

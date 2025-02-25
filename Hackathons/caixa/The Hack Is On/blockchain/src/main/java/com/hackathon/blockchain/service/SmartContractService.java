@@ -17,11 +17,8 @@ public class SmartContractService {
     private SmartContractRepository smartContractRepository; // Repositorio de SmartContract
 
     // Método para crear un contrato inteligente
-    public SmartContract createSmartContract(String contractId, String contractName, String conditionExpression, String action, String actionValue, String issuerWalletId) throws Exception {
-        // Verificar que la dirección de la wallet sea válida
-        Wallet associatedWallet = walletRepository.findByAddress(issuerWalletId)
-                .orElseThrow(() -> new Exception("Wallet no encontrada"));
-
+    public SmartContract createSmartContract(String contractName, String conditionExpression, 
+                                            String action, String actionValue, Wallet associatedWallet) throws Exception {
         // Verificar que la wallet esté activa
         if (!associatedWallet.getAccountStatus().equals("Active")) {
             throw new Exception("La wallet está inactiva y no puede ejecutar el contrato.");
@@ -32,16 +29,21 @@ public class SmartContractService {
             throw new Exception("La wallet no tiene suficientes fondos para ejecutar el contrato.");
         }
 
-        // Crear el contrato inteligente
-        SmartContract smartContract = new SmartContract(contractId, contractName, associatedWallet);
-        smartContract.setConditionExpression(conditionExpression);
-        smartContract.setAction(action);
-        smartContract.setActionValue(actionValue);
-        smartContract.setIssuerWalletId(issuerWalletId);
+        // Crear el contrato inteligente con todos los parámetros
+        SmartContract smartContract = new SmartContract(
+            contractName, 
+            contractName,  // Usando contractName en vez de contractId
+            associatedWallet,  // Wallet asociada al contrato
+            conditionExpression, 
+            action, 
+            actionValue
+        );
 
         // Guardar el contrato en la base de datos
         return smartContractRepository.save(smartContract);
     }
+
+
 
     // Método para calcular los fondos necesarios según la acción
     private double calculateRequiredFunds(String actionValue) {
