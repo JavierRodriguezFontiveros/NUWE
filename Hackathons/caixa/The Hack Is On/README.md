@@ -1,4 +1,9 @@
-# 🏦 CaixaBank Java Backend Challenge ☕️
+# Repository with solution and explanation
+
+[![Repo](https://img.shields.io/badge/GitHub-Repository-blue?style=for-the-badge&logo=github)](https://github.com/JavierRodriguezFontiveros/Blockchain_Backend)
+
+
+# 🏦 CaixaBank Java Backend Challenge Statement ☕️
 
 **Category:** Software  
 **Subcategory:** Java Backend  
