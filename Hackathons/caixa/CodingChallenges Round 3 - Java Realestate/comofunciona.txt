@@ -1,0 +1,88 @@
+SISTEMA DE SUBASTAS INMOBILIARIAS:
+-Usa tecnoglogía JWT para usuarios
+-Webscrapping de Idealista
+-Gestiona las Hipotecas.
+-RabbitMQ: subastas en tiempo real
+
+Estructura del repositorio SPRING BOOT:
+-Config: Configuraciones generales de rabbit, spring boot...
+-Controller: Endpoints de la api
+-Entity: Clases de JPA (usario, role, propiedad, puja...)
+-Messaging: Mensajería con RabbitMQ para gestionar las pujas.
+-Payload: Clases para las solicitudes y respuestas de la API (DTOs).
+-Repository: Interfaces que gestionan el acceso a base de datos con Spring Data JPA.
+-Security: Implementaciones para JWT y gestión de autenticación de usuarios.
+...
+
+Aplication properties: configuración completa de la aplicación
+DockerFile: construcción de la app
+DockerCompose: define los servicios de las bases de datos y RabbitMQ
+...
+
+Tarea 1:
+Levantar el backend sin fallos en las dependencias
+
+Tarea 2:
+---ENDPOINTS---
+-Post Registro: Recibe nombre de usuario, correo y contraseña.
+           Verifica que el email sea único.
+           Cifra la contraseña usando BCrypt.
+           Guarda el usuario con estado "unemployed" por defecto.
+           Devuelve un mensaje de éxito.
+
+-Post Login: Recibe correo/usuario y contraseña.
+        Valida credenciales con la base de datos.
+        Si es correcto, genera un JWT con el ID del usuario.
+        Devuelve el JWT en la respuesta.
+
+-Get User: Extrae la información del usuario desde el JWT.
+
+ARCHIVOS:
+*Annotation, Value: Podría utilizarse para inyectar valores en campos o marcarlos para algún procesamiento especial en tiempo de ejecución.
+
+*Config, RabbitMQConverterConfig: Facilita la serialización/deserialización de objetos en los mensajes de RabbitMQ.
+                                 Evita la necesidad de convertir manualmente los mensajes de JSON a objetos en cada publicación/consumo.
+
+ Config, SecurityConfig: Inyección del filtro JWT
+                        Codificación de contraseñas
+                        Definición de reglas de seguridad: Desactiva CSRF
+                                                           Permite acceso sin autenticación solo a /api/auth/register y /api/auth/login.   
+                                                           Protege todas las demás rutas (/api/**), requiriendo autenticación con JWT.
+                                                           Configura el sistema como stateless, evitando sesiones.
+                                                           Añade el filtro JWT antes de la autenticación estándar.
+
+*Controller, AuthController: Definición de los endpoints.
+
+ Controller, UserController: Obtener el usario autenticado.
+                             Clases internas de apoyo.
+                    
+*Entity, Role: Representa la entidad role en la base de datos.
+
+ Entity, User: Representa la entidad user (propiedades de usuario) en la base de datos.
+
+*Filter, JWTRequestFilter: Manejo de dependencias.
+                           Valor secreto para la firma de JWT.
+                           Método init para validar la firma.
+                           Método doFilterInternal, para las solicitudes HTTP
+                           Métodos auxiliares.
+
+*Repository, UserRepository: Extiende JpaRepository, métodos que interactuan con la base de datos.
+                             Básicamente gestiona la clase user en la DB.
+
+*Service, AuthService: Autenticación del usuario.
+                       Registro de Usuario.
+                       Generación de JWT.
+                       Manejo de Errores
+
+ Service, CustomUserDetails: Maneja los datos del usuario en la autenticación.
+
+ Service, UserDetailsServiceImpl: Se encarga de cargar los detalles de un usuario para la autenticación con Spring Security.
+
+ *Util, JwtUtil: Maneja la generación y validación de tokens JWT (JSON Web Tokens) en una aplicación.
+
+ DOCKER-COMPOSE.yml : Define la App, la base de datos y el RabbitMQ.
+ DOCKERFILE: utiliza la aplicación de java con maven.
+ POM.XML: Se definen todas las dependencias del proyecto.
+ AplicationProperties: Configuración global de proyecto.
+
+ 
