@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package frontend;
+
+import "notification.proto";  // Importa la definición de notification.proto
+
+service FrontendService {
+    // Recibe una lista de notificaciones desde NotificationService
+    rpc ReceiveNotifications (NotificationListRequest) returns (NotificationResponse);
+}
+
+// Definición de la solicitud para recibir una lista de notificaciones
+message NotificationListRequest {
+    repeated notification.NotificationRequest notifications = 1;  // Usa correctamente el mensaje de notification
+}
+
+// Respuesta del servicio de frontend
+message NotificationResponse {
+    bool success = 1;
+}
