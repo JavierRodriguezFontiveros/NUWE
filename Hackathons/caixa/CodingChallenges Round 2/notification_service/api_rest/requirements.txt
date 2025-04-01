@@ -1,5 +1,0 @@
-flask
-grpcio
-grpcio-tools
-protobuf
-redis

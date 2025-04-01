@@ -1,7 +1,0 @@
-grpcio
-grpcio-tools
-flask
-redis
-protobuf
-bcrypt
-werkzeug
