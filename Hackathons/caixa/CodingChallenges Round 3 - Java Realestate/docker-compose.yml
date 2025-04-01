@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+      - rabbitmq
+    networks:
+      - realestate_network
+    restart: always
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: realestate
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    networks:
+      - realestate_network
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"   # App connection
+      - "15672:15672" # Administration UI - localhost:15672
+    networks:
+      - realestate_network
+    restart: always
+
+networks:
+  realestate_network:
+    driver: bridge

@@ -1,0 +1,326 @@
+ACCESO A LA BASE DE DATOS:
+
+docker exec -it caixabank-backend-java-realestate-mysql-1 mysql -u root -p
+
+
+🌐 Antecedentes
+Este reto simula un sistema de subastas inmobiliarias para CaixaBank. El backend está desarrollado en Java y ofrece diversas funcionalidades, entre ellas:
+- Autenticación y registro de usuarios mediante JWT;
+- Extracción (scraping) de datos de propiedades directamente de Idealista;
+- Un sistema automático de solicitud de hipotecas basado en los datos financieros del usuario;
+- Un sistema de subastas de propiedades que utiliza RabbitMQ para gestionar pujas simultáneas.
+
+El objetivo es evaluar sus habilidades en el desarrollo de API seguras, extracción de datos externos, implementación de reglas comerciales y procesamiento de mensajes asincrónicos mediante colas.
+
+caixabank-backend-java-realestate
+├── src
+│   └──main
+│       ├── java
+│       │   └── com
+│       │       └── round3
+│       │           └── realestate
+│       │               ├── config           # Spring Security, RabbitMQ, and other configurations
+│       │               ├── controller       # REST API endpoints
+│       │               ├── entity           # JPA entities
+│       │               ├── messaging        # Message publishing/consuming classes (BidMessage, BidPublisher, etc.)
+│       │               ├── payload          # Request and response payload classes
+│       │               ├── repository       # Spring Data repositories
+│       │               └── security         # JWT and UserDetails implementations
+│       └── resources
+│           ├── application.properties         # Application configuration
+│           └── ...
+├── Dockerfile                                 # Docker build instructions
+├── docker-compose.yml
+├── README.md
+└── ...
+
+ Tareas
+Tarea 1: Dockerfile y comprobación del estado
+
+Tarea 2: Iniciar sesión y registrarse con JWT
+
+Tarea 3: Obtener datos de propiedades directamente de Idealista
+
+Tarea 4: Sistema automático de solicitud de hipotecas
+
+Tarea 5: Sistema de licitación de una propiedad
+
+Lea atentamente todo el archivo README, así como las guías detalladas para comprender completamente los requisitos del desafío.
+
+Más información
+El archivo application.properties contiene la configuración necesaria para el correcto funcionamiento de la aplicación.
+
+Las pruebas de backend simularán la interacción de un usuario directamente con la API que se ejecuta en un contenedor y está expuesta en el puerto 3000
+
+📤 Envío
+Resolver las tareas propuestas.
+
+Impulsa continuamente los cambios que has realizado.
+
+Espere los resultados.
+
+Haz clic en Enviar desafío cuando hayas alcanzado tu puntuación máxima.
+
+📊 Evaluación
+La puntuación final se dará en función de si se han cumplido o no los objetivos.
+
+En este caso, el desafío se evaluará en 1450 (1050 para tareas de backend y 400 para calidad del código) puntos que se distribuyen de la siguiente manera:
+
+Backend
+Tarea 1 : 50 puntos
+
+Tarea 2 : 200 puntos
+
+Tarea 3 : 250 puntos
+
+Tarea 4 : 250 puntos
+
+Tarea 5 : 300 puntos
+
+Calidad del código : 400 puntos
+
+❓ Información adicional
+P1: ¿Puedo cambiar algo en la aplicación?
+
+A1: Sí, dado que se trata de un hackathon y la aplicación está dockerizada, puedes modificar cualquier elemento del proyecto, excepto las funciones predefinidas y archivos como: docker-compose.ymly application.properties. Si modificas application.properties, asegúrate de restaurarlo a su estado original antes de enviar el proyecto. DockerfileSe entrega configurado para funcionar correctamente.
+
+P2: ¿Puedo agregar recursos que no estén en pom.xml?
+
+A2: Sí, puedes agregar nuevos recursos si es necesario, pero ten en cuenta que todo lo necesario para desarrollarlo ya está agregado.
+
+P3: ¿Es completamente necesario realizar primero la configuración del Dockerfile?
+
+A3: Sí. Para garantizar la integridad de la corrección, un entorno Dockerizado es la opción más segura. DockerfileSe proporciona configurado para funcionar completamente, por lo que solo es necesario enviar el código y comprobar que la puntuación aparece en la primera tarea.
+
+P4: Obtuve 0 puntos en la tarea 1, ¿qué pasa?
+
+A4: Probablemente haya una configuración incorrecta en uno de los siguientes archivos: - Dockerfile- application.propertiesTambién es posible que su código no se compile y el contenedor de la aplicación no se implemente y la conexión API falle.
+
+Q5: ¿Cuál es la última versión de README?
+
+A5: La versión más reciente siempre será la que aparezca en la plataforma. Si hay algún error en el archivo Léame, puede consultar la versión actualizada en el sitio web de NUWE.
+
+Task 1 solución: Manipulando los puertos de dockercompose.yml
+
+***************************************************
+***********************TASK 2**********************
+***************************************************
+
+Tarea 2: Iniciar sesión y registrarse con JWT
+Objetivo:
+Implementar puntos finales de registro e inicio de sesión de usuarios seguros utilizando JSON Web Tokens (JWT) para la autenticación.
+
+Requisitos detallados:
+
+Registro (POST /api/auth/register ):
+
+Acepte los detalles del usuario, como nombre de usuario, correo electrónico y contraseña.
+
+Validar que el correo electrónico sea único.
+
+Cifre la contraseña (por ejemplo, utilizando BCrypt) antes de almacenarla en la base de datos.
+
+Establecer nuevos usuarios como unemployedpredeterminados.
+
+Devolver un mensaje de éxito una vez que el usuario se haya registrado.
+
+Acceso (POST /api/auth/login ):
+
+Aceptar las credenciales del usuario (nombre de usuario/correo electrónico y contraseña).
+
+Validar las credenciales contra los datos almacenados.
+
+Si la autenticación es exitosa, genere un JWT que incluya al menos el ID del usuario como asunto.
+
+El JWT debe tener un tiempo de expiración definido en las propiedades de la aplicación.
+
+Devuelve el JWT en la respuesta. Por ejemplo: { "success": true, "token": "<JWT_TOKEN>" }.
+
+Comprobación de sesión (GET /api/user/me ):
+
+Devuelve el ID del usuario, el nombre de usuario y el correo electrónico.
+
+Se utiliza para verificar que los tokens funcionan correctamente.
+
+  { "id": 1, "username": "nuwe", "email": "nuwe@example.com" }
+Consideraciones de seguridad:
+
+Asegúrese de que el JWT se utilice para proteger todos los puntos finales que requieren autenticación.
+
+Implemente un filtro JWT que valide los tokens entrantes y cargue los detalles del usuario en consecuencia.
+
+
+guia:
+
+Endpoint	Method	Auth Required	Possible Status Codes	Response Example
+/api/auth/register	POST	No	200 OK, 400 Bad Request	{ "success": true, "message": "User successfully registered" }
+/api/auth/login	POST	No	200 OK, 401 Unauthorized	{ "accessToken": "eyJhbGciOiJIUzUxMiJ9...", "tokenType": "Bearer" }
+/api/user/me	GET	Yes	200 OK, 401 Unauthorized	{ "id": 1, "username": "nuwe", "email": "nuwe@example.com" }
+
+
+
+PRUEBAS COMPLETAS:
+-------------------------REGISTER POST-----------------------------
+Content-Type: application/json
+http://localhost:3000/api/auth/register
+{
+  "username": "nuwe",
+  "email": "nuwe@example.com",
+  "password": "testpassword12#"
+}
+
+{ "success": true, "message": "User successfully registered" }
+
+{
+  "username": "nuwe",
+  "email": "nuw2e@example.com",
+  "password": "testp2assword12#"
+}
+
+{ "success": false, "message": "The username already exists" }
+
+{
+  "username": "nuwe22",
+  "email": "nuwe@example.com",
+  "password": "testpassword122#"
+}
+
+{ "success": false, "message": "Email already exists" }
+
+-------------------------LOGIN POST---------------------------------
+Content-Type: application/json
+http://localhost:3000/api/auth/login
+{
+  "usernameOrEmail": "nuwe",
+  "password": "testpassword12#"
+}
+
+{
+  "accessToken": "eyJhbGciOiJIUzUxMiJ9...",
+  "tokenType": "Bearer"
+}
+
+{
+  "usernameOrEmail": "nuwe",
+  "password": "testpassw1ord12#"
+}
+
+
+{ "success": false, "message": "Unauthorized: Bad credentials" }
+
+-------------------------SESION GET---------------------------------
+Content-Type: application/json
+http://localhost:3000/api/user/me
+
+{
+    "id": 1,
+    "username": "nuwe",
+    "email": "nuwe@example.com"
+}
+""""headers"""""
+Authorization
+bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzQyNDAwNzQ5LCJleHAiOjE3NDI0MDQzNDl9.ZTacc3Qmj-GZe1b_yrqzx0xIa6JxM5R9nZqvWJ4I0pyAY8Cu6yFGUo75HIrCNHRFqmPIsJpsqqni4eIRFhxcxQ
+
+{
+    "success": false,
+    "error": "Unauthorised: Full authentication is required to access this resource"
+}
+
+
+http://localhost:3000/api/auth/register POST
+{
+  "username": "nuwe",
+  "email": "nuwe@example.com",
+  "password": "testpassword12#"
+}
+
+http://localhost:3000/api/auth/login POST
+{
+  "usernameOrEmail": "nuwe",
+  "password": "testpassword12#"
+}
+
+""""headers"""""
+Authorization
+bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzQyNDAwNzQ5LCJleHAiOjE3NDI0MDQzNDl9.ZTacc3Qmj-GZe1b_yrqzx0xIa6JxM5R9nZqvWJ4I0pyAY8Cu6yFGUo75HIrCNHRFqmPIsJpsqqni4eIRFhxcxQ
+
+
+http://localhost:3000/api/user/me  GET
+
+{
+    "id": 1,
+    "username": "nuwe",
+    "email": "nuwe@example.com"
+}
+
+
+--------------------------PRUEBAS SCRAPING--------------------------
+http://localhost:3000/api/scrape POST
+
+Headers: Content-Type: application/json
+{
+    "url": "https://www.idealista.com/inmueble/104498284/",
+    "store": false
+}
+
+{
+    "data": {
+        "fullTitle": "Casa o chalet independiente en venta en Las Rozas",
+        "rooms": "9 hab.",
+        "size": "361 m²",
+        "price": "680.000",
+        "location": "Campoo-Los Valles, Cantabria",
+        "type": "Casa",
+        "url": "https://www.idealista.com/inmueble/104498284/"
+    },
+    "saved": false
+}
+
+
+{
+    "url": "https://www.idealista.com/inmueble/104498284/",
+    "store": true
+}
+
+{
+    "data": {
+        "fullTitle": "Casa o chalet independiente en venta en Las Rozas",
+        "rooms": "9 hab.",
+        "size": "361 m²",
+        "price": "680.000",
+        "location": "Campoo-Los Valles, Cantabria",
+        "type": "Casa",
+        "url": "https://www.idealista.com/inmueble/104498284/"
+    },
+    "saved": true
+}
+
+--------------------------Tarea 5--------------------------
+http://localhost:3000/api/auction/create POST
+
+{
+  "propertyId": 1,
+  "startTime": "2025-03-07T10:00:00",
+  "endTime": "2025-03-07T11:00:00",
+  "minIncrement": 1000,
+  "startingPrice": 335000
+}
+
+{
+  "success": true,
+  "message": "Auction created successfully.",
+  "auctionId": 1
+}
+
+POSIBLES ERRORES:
+
+
+{
+  "success": false,
+  "error": "Property not found."
+}
+
+{
+  "success": false,
+  "error": "Property is not available."
+}
